@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'archive64/**'
+      - 'poker-analyzer-v0.5.zip'
       - '.github/workflows/build-apk.yml'
   workflow_dispatch:
 
@@ -30,16 +30,14 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Rebuild verified project archive
+      - name: Extract project
         shell: bash
         run: |
           set -euo pipefail
-          cat archive64/part-*.txt | tr -d '\n\r' | base64 -d > /tmp/poker-analyzer-v0.5.zip
-          echo "53d3e47ede4d5a0d191efb2a034fcfdeae58dad66c7d712b1ea6710246e9ca5d  /tmp/poker-analyzer-v0.5.zip" | sha256sum -c -
-          unzip -t /tmp/poker-analyzer-v0.5.zip
+          unzip -t poker-analyzer-v0.5.zip
           rm -rf build-src
           mkdir build-src
-          unzip -q /tmp/poker-analyzer-v0.5.zip -d build-src
+          unzip -q poker-analyzer-v0.5.zip -d build-src
 
       - name: Install dependencies
         working-directory: build-src/poker-analyzer-v0.5
@@ -59,10 +57,10 @@ jobs:
         working-directory: build-src/poker-analyzer-v0.5/android
         run: |
           chmod +x gradlew
-          ./gradlew assembleRelease --no-daemon
+          ./gradlew assembleDebug --no-daemon
 
       - name: Prepare APK
-        run: cp build-src/poker-analyzer-v0.5/android/app/build/outputs/apk/release/app-release.apk PokerAnalyzer-v0.5.apk
+        run: cp build-src/poker-analyzer-v0.5/android/app/build/outputs/apk/debug/app-debug.apk PokerAnalyzer-v0.5.apk
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
