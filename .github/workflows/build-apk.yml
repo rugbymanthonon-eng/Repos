@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'project-b64/**'
+      - 'archive64/**'
       - '.github/workflows/build-apk.yml'
   workflow_dispatch:
 
@@ -32,7 +32,8 @@ jobs:
 
       - name: Rebuild project archive
         run: |
-          cat project-b64/part-*.txt | tr -d '\n\r' | base64 -d > /tmp/poker-analyzer-v0.5.zip
+          cat archive64/part-*.txt | tr -d '\n\r' | base64 -d > /tmp/poker-analyzer-v0.5.zip
+          echo "53d3e47ede4d5a0d191efb2a034fcfdeae58dad66c7d712b1ea6710246e9ca5d  /tmp/poker-analyzer-v0.5.zip" | sha256sum -c -
           unzip -t /tmp/poker-analyzer-v0.5.zip
           rm -rf build-src
           mkdir build-src
